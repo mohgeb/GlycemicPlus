@@ -1,0 +1,3000 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>GlycemicPlus — PPG Research Console</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            bg: "#0f131d",
+            panel: "#171b26",
+            panel2: "#1c1f2a",
+            panel3: "#262a35",
+            panel4: "#313540",
+
+            text: "#dfe2f1",
+            muted: "#869397",
+
+            cyan: "#4cd7f6",
+            teal: "#4fdbc8",
+            amber: "#ffb95f",
+            danger: "#ff8f87"
+          },
+
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Plus Jakarta Sans", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: #0f131d;
+      color: #dfe2f1;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #313540;
+      border-radius: 999px;
+    }
+
+    .glass {
+      background: rgba(23, 27, 38, 0.88);
+      backdrop-filter: blur(14px);
+    }
+
+    .metric-value {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 700;
+    }
+
+    .chart-grid {
+      stroke: #313540;
+      stroke-width: 1;
+      opacity: 0.55;
+    }
+
+    .subject-pill.active {
+      background: #06b6d4;
+      color: #001f26;
+      font-weight: 700;
+    }
+
+    .nav-btn.active {
+      background: rgba(76, 215, 246, 0.12);
+      color: #4cd7f6;
+    }
+
+    .audit-row:hover {
+      background: rgba(49, 53, 64, 0.45);
+    }
+
+    .pulse-dot {
+      animation: pulseDot 1.5s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.35;
+        transform: scale(1.45);
+      }
+    }
+  </style>
+</head>
+
+
+<body class="font-sans">
+
+<!-- =======================================================
+     SIDEBAR
+======================================================= -->
+
+<aside
+  class="fixed left-0 top-0 z-50 hidden h-screen w-72 flex-col
+         bg-panel border-r border-panel4/30 lg:flex"
+>
+
+  <div class="h-20 px-5 flex items-center gap-3">
+
+    <div
+      class="w-11 h-11 rounded-xl bg-cyan/15
+             flex items-center justify-center"
+    >
+      <span class="material-symbols-outlined text-cyan text-2xl">
+        vital_signs
+      </span>
+    </div>
+
+    <div>
+      <div class="font-display font-bold text-xl">
+        GlycemicPlus
+      </div>
+
+      <div
+        class="font-mono text-[10px] uppercase
+               tracking-[0.14em] text-cyan"
+      >
+        PPG Research Console
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- PROJECT STATUS -->
+
+  <div class="px-4">
+
+    <div class="bg-panel2 rounded-xl p-3">
+
+      <div
+        class="font-mono text-[10px] uppercase
+               tracking-wider text-muted"
+      >
+        Experiment
+      </div>
+
+      <div class="flex items-center gap-2 mt-2">
+
+        <span
+          class="w-2 h-2 rounded-full bg-teal pulse-dot"
+        ></span>
+
+        <span class="text-sm font-medium">
+          Historical Replay Active
+        </span>
+
+      </div>
+
+      <div
+        class="mt-2 font-mono text-[10px] text-muted"
+      >
+        5-minute PPG windows
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- GLYCEMIC CORRIDOR -->
+
+  <div class="px-4 pt-4">
+
+    <div class="bg-panel2 rounded-xl p-3">
+
+      <div
+        class="font-mono text-[10px] uppercase
+               tracking-wider text-muted mb-3"
+      >
+        Glycemic Corridor
+      </div>
+
+
+      <div class="space-y-2 text-xs">
+
+        <div class="flex justify-between">
+          <span class="flex gap-2 items-center">
+
+            <span
+              class="w-2 h-2 rounded-full bg-danger"
+            ></span>
+
+            Hypoglycemia
+          </span>
+
+          <span class="font-mono text-danger">
+            &lt;70
+          </span>
+        </div>
+
+
+        <div class="flex justify-between">
+          <span class="flex gap-2 items-center">
+
+            <span
+              class="w-2 h-2 rounded-full bg-teal"
+            ></span>
+
+            In Range
+          </span>
+
+          <span class="font-mono text-teal">
+            70–180
+          </span>
+        </div>
+
+
+        <div class="flex justify-between">
+          <span class="flex gap-2 items-center">
+
+            <span
+              class="w-2 h-2 rounded-full bg-amber"
+            ></span>
+
+            Hyperglycemia
+          </span>
+
+          <span class="font-mono text-amber">
+            &gt;180
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- NAV -->
+
+  <nav class="flex-1 px-4 pt-5 space-y-1">
+
+    <button
+      data-section="replay"
+      class="nav-btn active w-full text-left
+             px-4 py-3 rounded-xl flex items-center gap-3"
+    >
+      <span class="material-symbols-outlined">
+        monitoring
+      </span>
+
+      Replay Monitor
+    </button>
+
+
+    <button
+      data-section="models"
+      class="nav-btn w-full text-left
+             px-4 py-3 rounded-xl flex items-center gap-3
+             text-muted hover:text-text hover:bg-panel3"
+    >
+      <span class="material-symbols-outlined">
+        model_training
+      </span>
+
+      Model Benchmark
+    </button>
+
+
+    <button
+      data-section="audit"
+      class="nav-btn w-full text-left
+             px-4 py-3 rounded-xl flex items-center gap-3
+             text-muted hover:text-text hover:bg-panel3"
+    >
+      <span class="material-symbols-outlined">
+        fact_check
+      </span>
+
+      Prediction Audit
+    </button>
+
+
+    <button
+      data-section="about"
+      class="nav-btn w-full text-left
+             px-4 py-3 rounded-xl flex items-center gap-3
+             text-muted hover:text-text hover:bg-panel3"
+    >
+      <span class="material-symbols-outlined">
+        science
+      </span>
+
+      Research Notes
+    </button>
+
+  </nav>
+
+
+  <!-- DISCLAIMER -->
+
+  <div class="p-4">
+
+    <div
+      class="bg-danger/5 border border-danger/10
+             rounded-xl p-3 text-[11px] text-muted"
+    >
+      <strong class="text-danger">
+        Research prototype.
+      </strong>
+
+      Not for diagnosis, insulin dosing, or treatment decisions.
+    </div>
+
+  </div>
+
+</aside>
+
+
+<!-- =======================================================
+     MAIN
+======================================================= -->
+
+<div class="lg:pl-72">
+
+
+  <!-- HEADER -->
+
+  <header
+    class="sticky top-0 z-40 h-16 glass
+           border-b border-panel4/30
+           flex items-center justify-between px-5 lg:px-7"
+  >
+
+    <div class="flex items-center gap-3">
+
+      <span
+        class="w-2 h-2 bg-teal rounded-full pulse-dot"
+      ></span>
+
+      <span
+        class="font-mono text-xs uppercase
+               tracking-wider text-teal"
+      >
+        Historical Model Replay
+      </span>
+
+    </div>
+
+
+    <div
+      class="font-mono text-xs text-muted"
+      id="current-time-label"
+    >
+      —
+    </div>
+
+  </header>
+
+
+  <main
+    class="max-w-[1680px] mx-auto
+           px-4 lg:px-7 py-6 space-y-6"
+  >
+
+
+    <!-- ===================================================
+         SUBJECT RIBBON
+    =================================================== -->
+
+    <section
+      class="bg-panel rounded-2xl p-4
+             border border-panel4/20"
+    >
+
+      <div
+        class="flex flex-col xl:flex-row
+               xl:items-center xl:justify-between gap-4"
+      >
+
+        <div>
+
+          <div
+            class="font-mono text-[10px]
+                   uppercase tracking-wider text-cyan"
+          >
+            Active Participant
+          </div>
+
+          <h1
+            id="subject-title"
+            class="font-display text-2xl
+                   font-bold mt-1"
+          >
+            —
+          </h1>
+
+          <p
+            class="text-sm text-muted mt-1"
+          >
+            Predictions generated from wearable PPG-derived model inputs.
+            Dexcom values are used only as retrospective ground truth.
+          </p>
+
+        </div>
+
+
+        <div
+          id="subject-switcher"
+          class="flex gap-2 overflow-x-auto pb-1"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         KPI GRID
+    =================================================== -->
+
+    <section
+      class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4"
+    >
+
+
+      <!-- MODEL ESTIMATE -->
+
+      <article class="bg-panel rounded-2xl p-5">
+
+        <div
+          class="font-mono text-[10px]
+                 uppercase tracking-wider text-muted"
+        >
+          Model Estimate
+        </div>
+
+        <div
+          id="model-estimate"
+          class="metric-value text-3xl mt-3"
+        >
+          —
+        </div>
+
+        <div
+          id="raw-prediction"
+          class="text-xs text-muted mt-2"
+        >
+          —
+        </div>
+
+      </article>
+
+
+      <!-- CONFIDENCE -->
+
+      <article class="bg-panel rounded-2xl p-5">
+
+        <div
+          class="font-mono text-[10px]
+                 uppercase tracking-wider text-muted"
+        >
+          Model Confidence
+        </div>
+
+        <div
+          id="confidence-value"
+          class="metric-value text-3xl mt-3 text-cyan"
+        >
+          —
+        </div>
+
+        <div
+          id="margin-value"
+          class="text-xs text-muted mt-2"
+        >
+          —
+        </div>
+
+      </article>
+
+
+      <!-- GROUND TRUTH -->
+
+      <article class="bg-panel rounded-2xl p-5">
+
+        <div class="flex justify-between">
+
+          <div
+            class="font-mono text-[10px]
+                   uppercase tracking-wider text-muted"
+          >
+            Dexcom Ground Truth
+          </div>
+
+          <button
+            id="truth-toggle"
+            class="font-mono text-[10px]
+                   px-2 py-1 rounded-md
+                   bg-cyan/10 text-cyan"
+          >
+            Reveal
+          </button>
+
+        </div>
+
+        <div
+          id="ground-truth-value"
+          class="metric-value text-3xl mt-3"
+        >
+          Hidden
+        </div>
+
+        <div
+          id="ground-truth-label"
+          class="text-xs text-muted mt-2"
+        >
+          Used only for validation
+        </div>
+
+      </article>
+
+
+      <!-- AGREEMENT -->
+
+      <article class="bg-panel rounded-2xl p-5">
+
+        <div
+          class="font-mono text-[10px]
+                 uppercase tracking-wider text-muted"
+        >
+          Subject Agreement
+        </div>
+
+        <div
+          id="agreement-value"
+          class="metric-value text-3xl mt-3 text-teal"
+        >
+          —
+        </div>
+
+        <div
+          id="frame-count"
+          class="text-xs text-muted mt-2"
+        >
+          —
+        </div>
+
+      </article>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         REPLAY CONTROLS
+    =================================================== -->
+
+    <section
+      class="bg-panel rounded-2xl p-4
+             flex flex-col md:flex-row
+             md:items-center gap-4"
+    >
+
+      <button
+        id="play-btn"
+        class="bg-cyan text-[#001f26]
+               font-semibold rounded-xl
+               px-4 py-2 flex gap-2
+               items-center justify-center"
+      >
+
+        <span
+          class="material-symbols-outlined"
+          id="play-icon"
+        >
+          play_arrow
+        </span>
+
+        <span id="play-label">
+          Play Replay
+        </span>
+
+      </button>
+
+
+      <div class="flex-1">
+
+        <input
+          id="frame-slider"
+          type="range"
+          min="0"
+          max="0"
+          value="0"
+          class="w-full accent-cyan"
+        />
+
+      </div>
+
+
+      <div
+        id="frame-counter"
+        class="font-mono text-xs text-muted min-w-[110px]"
+      >
+        —
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         MAIN CHART + PROBABILITIES
+    =================================================== -->
+
+    <section
+      id="replay"
+      class="grid grid-cols-1 xl:grid-cols-12 gap-5"
+    >
+
+
+      <!-- GLUCOSE TIMELINE -->
+
+      <div
+        class="xl:col-span-8
+               bg-panel rounded-2xl p-5"
+      >
+
+        <div
+          class="flex justify-between
+                 items-start gap-4 mb-4"
+        >
+
+          <div>
+
+            <h2
+              class="font-display text-lg font-semibold"
+            >
+              Dexcom Ground-Truth Timeline
+            </h2>
+
+            <p class="text-xs text-muted mt-1">
+              Retrospective glucose trajectory synchronized with each
+              model prediction window.
+            </p>
+
+          </div>
+
+          <div class="flex gap-2">
+
+            <button
+              data-window="all"
+              class="window-btn bg-panel4 text-cyan
+                     rounded-lg px-3 py-1 text-xs"
+            >
+              Full
+            </button>
+
+            <button
+              data-window="24"
+              class="window-btn bg-panel2 text-muted
+                     rounded-lg px-3 py-1 text-xs"
+            >
+              24 frames
+            </button>
+
+            <button
+              data-window="12"
+              class="window-btn bg-panel2 text-muted
+                     rounded-lg px-3 py-1 text-xs"
+            >
+              12 frames
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="h-[390px]
+                 bg-[#0a0e18]
+                 rounded-xl overflow-hidden"
+        >
+
+          <svg
+            id="glucose-chart"
+            width="100%"
+            height="100%"
+            viewBox="0 0 1000 390"
+            preserveAspectRatio="none"
+          ></svg>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- PROBABILITY CARD -->
+
+      <div
+        class="xl:col-span-4
+               bg-panel rounded-2xl p-5"
+      >
+
+        <h2
+          class="font-display text-lg font-semibold"
+        >
+          Model Probability Vector
+        </h2>
+
+        <p class="text-xs text-muted mt-1 mb-5">
+          Hybrid probability output for the selected window.
+        </p>
+
+
+        <div class="space-y-5">
+
+
+          <!-- HYPO -->
+
+          <div>
+
+            <div class="flex justify-between text-sm mb-2">
+
+              <span class="text-danger">
+                Hypoglycemia
+              </span>
+
+              <span
+                id="hypo-percent"
+                class="font-mono"
+              >
+                —
+              </span>
+
+            </div>
+
+            <div
+              class="h-3 rounded-full
+                     bg-panel4 overflow-hidden"
+            >
+
+              <div
+                id="hypo-bar"
+                class="h-full bg-danger rounded-full"
+              ></div>
+
+            </div>
+
+          </div>
+
+
+          <!-- NORMAL -->
+
+          <div>
+
+            <div class="flex justify-between text-sm mb-2">
+
+              <span class="text-teal">
+                In Range
+              </span>
+
+              <span
+                id="normal-percent"
+                class="font-mono"
+              >
+                —
+              </span>
+
+            </div>
+
+            <div
+              class="h-3 rounded-full
+                     bg-panel4 overflow-hidden"
+            >
+
+              <div
+                id="normal-bar"
+                class="h-full bg-teal rounded-full"
+              ></div>
+
+            </div>
+
+          </div>
+
+
+          <!-- HYPER -->
+
+          <div>
+
+            <div class="flex justify-between text-sm mb-2">
+
+              <span class="text-amber">
+                Hyperglycemia
+              </span>
+
+              <span
+                id="hyper-percent"
+                class="font-mono"
+              >
+                —
+              </span>
+
+            </div>
+
+            <div
+              class="h-3 rounded-full
+                     bg-panel4 overflow-hidden"
+            >
+
+              <div
+                id="hyper-bar"
+                class="h-full bg-amber rounded-full"
+              ></div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="mt-6 bg-panel2 rounded-xl p-4"
+        >
+
+          <div
+            class="font-mono text-[10px]
+                   uppercase tracking-wider text-muted"
+          >
+            Uncertainty Gate
+          </div>
+
+          <div
+            id="uncertainty-description"
+            class="text-sm mt-2"
+          >
+            —
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         MODEL BENCHMARK
+    =================================================== -->
+
+    <section
+      id="models"
+      class="bg-panel rounded-2xl p-5"
+    >
+
+      <div
+        class="flex flex-col md:flex-row
+               md:items-end justify-between gap-3"
+      >
+
+        <div>
+
+          <h2
+            class="font-display text-xl font-semibold"
+          >
+            Model Benchmark
+          </h2>
+
+          <p class="text-sm text-muted mt-1">
+            Chronological personalized evaluation:
+            70% train / 15% validation / 15% test.
+          </p>
+
+        </div>
+
+        <span
+          class="font-mono text-xs text-cyan"
+        >
+          Hybrid selected
+        </span>
+
+      </div>
+
+
+      <div
+        id="model-cards"
+        class="grid grid-cols-1 md:grid-cols-3
+               gap-4 mt-5"
+      ></div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         SUBJECT DISTRIBUTION
+    =================================================== -->
+
+    <section
+      class="grid grid-cols-1 xl:grid-cols-2 gap-5"
+    >
+
+
+      <article class="bg-panel rounded-2xl p-5">
+
+        <h2
+          class="font-display text-lg font-semibold"
+        >
+          Subject Glycemic Distribution
+        </h2>
+
+
+        <div class="mt-5">
+
+          <div
+            class="h-4 flex rounded-full overflow-hidden
+                   bg-panel4"
+          >
+
+            <div
+              id="distribution-hypo"
+              class="bg-danger"
+            ></div>
+
+            <div
+              id="distribution-normal"
+              class="bg-teal"
+            ></div>
+
+            <div
+              id="distribution-hyper"
+              class="bg-amber"
+            ></div>
+
+          </div>
+
+
+          <div
+            class="grid grid-cols-3 gap-3 mt-4
+                   font-mono text-xs"
+          >
+
+            <div>
+
+              <div class="text-danger">
+                Hypo
+              </div>
+
+              <div
+                id="distribution-hypo-label"
+                class="mt-1 text-lg text-text"
+              >
+                —
+              </div>
+
+            </div>
+
+
+            <div>
+
+              <div class="text-teal">
+                In Range
+              </div>
+
+              <div
+                id="distribution-normal-label"
+                class="mt-1 text-lg text-text"
+              >
+                —
+              </div>
+
+            </div>
+
+
+            <div>
+
+              <div class="text-amber">
+                Hyper
+              </div>
+
+              <div
+                id="distribution-hyper-label"
+                class="mt-1 text-lg text-text"
+              >
+                —
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+
+      <article class="bg-panel rounded-2xl p-5">
+
+        <h2
+          class="font-display text-lg font-semibold"
+        >
+          Session Range
+        </h2>
+
+
+        <div
+          class="grid grid-cols-2 gap-4 mt-5"
+        >
+
+          <div
+            class="bg-panel2 rounded-xl p-4"
+          >
+
+            <div
+              class="text-xs text-muted"
+            >
+              Peak
+            </div>
+
+            <div
+              id="session-peak"
+              class="metric-value text-3xl
+                     text-amber mt-2"
+            >
+              —
+            </div>
+
+          </div>
+
+
+          <div
+            class="bg-panel2 rounded-xl p-4"
+          >
+
+            <div
+              class="text-xs text-muted"
+            >
+              Nadir
+            </div>
+
+            <div
+              id="session-nadir"
+              class="metric-value text-3xl
+                     text-danger mt-2"
+            >
+              —
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         AUDIT LOG
+    =================================================== -->
+
+    <section
+      id="audit"
+      class="bg-panel rounded-2xl p-5"
+    >
+
+      <div
+        class="flex flex-col lg:flex-row
+               lg:items-center justify-between gap-4"
+      >
+
+        <div>
+
+          <h2
+            class="font-display text-xl font-semibold"
+          >
+            Prediction Audit Log
+          </h2>
+
+          <p class="text-sm text-muted mt-1">
+            Compare model inference with independent CGM ground truth.
+          </p>
+
+        </div>
+
+
+        <div class="flex gap-2 flex-wrap">
+
+          <button
+            data-filter="all"
+            class="audit-filter bg-panel4 text-cyan
+                   rounded-lg px-3 py-2 text-xs"
+          >
+            All
+          </button>
+
+          <button
+            data-filter="errors"
+            class="audit-filter bg-panel2 text-muted
+                   rounded-lg px-3 py-2 text-xs"
+          >
+            Errors
+          </button>
+
+          <button
+            data-filter="hypo"
+            class="audit-filter bg-panel2 text-muted
+                   rounded-lg px-3 py-2 text-xs"
+          >
+            Hypo
+          </button>
+
+          <button
+            data-filter="hyper"
+            class="audit-filter bg-panel2 text-muted
+                   rounded-lg px-3 py-2 text-xs"
+          >
+            Hyper
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="overflow-x-auto mt-5">
+
+        <table class="w-full text-sm">
+
+          <thead
+            class="font-mono text-[10px]
+                   uppercase tracking-wider text-muted"
+          >
+
+            <tr class="border-b border-panel4">
+
+              <th class="text-left p-3">
+                Timestamp
+              </th>
+
+              <th class="text-left p-3">
+                Subject
+              </th>
+
+              <th class="text-left p-3">
+                CGM
+              </th>
+
+              <th class="text-left p-3">
+                Ground Truth
+              </th>
+
+              <th class="text-left p-3">
+                Prediction
+              </th>
+
+              <th class="text-left p-3">
+                Probabilities
+              </th>
+
+              <th class="text-left p-3">
+                Confidence
+              </th>
+
+              <th class="text-left p-3">
+                Result
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody id="audit-table"></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         RESEARCH NOTES
+    =================================================== -->
+
+    <section
+      id="about"
+      class="bg-panel rounded-2xl p-5"
+    >
+
+      <h2
+        class="font-display text-xl font-semibold"
+      >
+        Research Context
+      </h2>
+
+
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3
+               gap-5 mt-5 text-sm"
+      >
+
+
+        <div class="bg-panel2 p-4 rounded-xl">
+
+          <div class="font-semibold text-cyan">
+            Input
+          </div>
+
+          <p class="text-muted mt-2">
+            Five-minute wearable PPG windows and engineered
+            physiological signal features.
+          </p>
+
+        </div>
+
+
+        <div class="bg-panel2 p-4 rounded-xl">
+
+          <div class="font-semibold text-teal">
+            Architecture
+          </div>
+
+          <p class="text-muted mt-2">
+            CatBoost gradient-boosted trees combined with a Temporal
+            Convolutional Network through validation-selected
+            probability fusion.
+          </p>
+
+        </div>
+
+
+        <div class="bg-panel2 p-4 rounded-xl">
+
+          <div class="font-semibold text-amber">
+            Validation
+          </div>
+
+          <p class="text-muted mt-2">
+            Dexcom CGM acts as retrospective ground truth and is not
+            supplied as an input to the prediction model.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="mt-5 bg-danger/5
+               border border-danger/10
+               p-4 rounded-xl text-sm text-muted"
+      >
+
+        GlycemicPlus is an experimental research prototype.
+        Current performance is not sufficient for clinical use.
+        It should not be used for diagnosis, insulin dosing,
+        or treatment decisions.
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   CONFIG
+========================================================= */
+
+const REPLAY_URL =
+  "./data/glycemic_sentinel_replay.json";
+
+const MODEL_URL =
+  "./data/personalized_model_comparison.csv";
+
+const CONFIDENCE_THRESHOLD = 0.45;
+const MARGIN_THRESHOLD = 0.05;
+
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let rawData = [];
+let modelData = [];
+
+let activeSubject = null;
+
+let activeRows = [];
+let frameIndex = 0;
+
+let revealTruth = false;
+
+let replayTimer = null;
+let playing = false;
+
+let chartWindow = "all";
+let auditFilter = "all";
+
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function pct(value) {
+  return `${(value * 100).toFixed(1)}%`;
+}
+
+
+function uncertaintyState(row) {
+
+  const probabilities = [
+    row.p_hypo,
+    row.p_normal,
+    row.p_hyper
+  ];
+
+  const sorted = [...probabilities]
+    .sort((a, b) => b - a);
+
+  const confidence = sorted[0];
+
+  const margin =
+    sorted[0] - sorted[1];
+
+  const uncertain =
+    confidence < CONFIDENCE_THRESHOLD ||
+    margin < MARGIN_THRESHOLD;
+
+  return {
+    confidence,
+    margin,
+    uncertain,
+
+    display:
+      uncertain
+        ? "Uncertain"
+        : row.predicted_label
+  };
+}
+
+
+function stateColor(label) {
+
+  if (
+    label === "Hypoglycemia" ||
+    label === "Hypo"
+  ) {
+    return "#ff8f87";
+  }
+
+  if (
+    label === "Hyperglycemia" ||
+    label === "Hyper"
+  ) {
+    return "#ffb95f";
+  }
+
+  if (label === "Uncertain") {
+    return "#869397";
+  }
+
+  return "#4fdbc8";
+}
+
+
+
+function parseCSV(text) {
+
+  const lines = text
+    .trim()
+    .split(/\r?\n/);
+
+  const headers =
+    lines[0].split(",").map(x => x.trim());
+
+  return lines.slice(1).map(line => {
+
+    const values =
+      line.split(",");
+
+    const row = {};
+
+    headers.forEach((header, i) => {
+      row[header] =
+        values[i]?.trim();
+    });
+
+    return row;
+  });
+
+}
+
+
+
+/* =========================================================
+   DATA LOAD
+========================================================= */
+
+async function init() {
+
+  try {
+
+    const [replayResponse, modelResponse] =
+      await Promise.all([
+        fetch(REPLAY_URL),
+        fetch(MODEL_URL)
+      ]);
+
+
+    if (!replayResponse.ok) {
+      throw new Error(
+        "Unable to load replay JSON."
+      );
+    }
+
+
+    if (!modelResponse.ok) {
+      throw new Error(
+        "Unable to load model comparison CSV."
+      );
+    }
+
+
+    rawData =
+      await replayResponse.json();
+
+
+    const csvText =
+      await modelResponse.text();
+
+
+    modelData =
+      parseCSV(csvText);
+
+
+    rawData = rawData.map(row => ({
+      ...row,
+
+      glucose:
+        Number(row.glucose),
+
+      p_hypo:
+        Number(row.p_hypo),
+
+      p_normal:
+        Number(row.p_normal),
+
+      p_hyper:
+        Number(row.p_hyper),
+
+      confidence:
+        Number(row.confidence)
+    }));
+
+
+    const subjects =
+      [...new Set(
+        rawData.map(row => row.subject)
+      )].sort();
+
+
+    activeSubject =
+      subjects[0];
+
+
+    renderSubjectSwitcher(subjects);
+
+    selectSubject(activeSubject);
+
+    renderModelCards();
+
+    setupNavigation();
+
+    setupControls();
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    document.body.innerHTML = `
+      <div style="
+        min-height:100vh;
+        background:#0f131d;
+        color:#dfe2f1;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-family:Inter,sans-serif;
+      ">
+        <div style="max-width:640px;padding:30px;">
+          <h1 style="color:#ff8f87;">
+            GlycemicPlus could not load.
+          </h1>
+
+          <p>
+            ${error.message}
+          </p>
+
+          <p style="color:#869397;">
+            Verify that both files exist inside
+            <code>dashboard/data/</code>.
+          </p>
+        </div>
+      </div>
+    `;
+
+  }
+}
+
+
+
+/* =========================================================
+   SUBJECTS
+========================================================= */
+
+function renderSubjectSwitcher(subjects) {
+
+  const container =
+    document.getElementById(
+      "subject-switcher"
+    );
+
+  container.innerHTML = "";
+
+
+  subjects.forEach(subject => {
+
+    const button =
+      document.createElement("button");
+
+
+    button.className =
+      "subject-pill bg-panel2 text-muted " +
+      "hover:text-text px-3 py-2 " +
+      "rounded-xl font-mono text-xs";
+
+
+    button.dataset.subject =
+      subject;
+
+
+    button.textContent =
+      subject;
+
+
+    button.onclick =
+      () => selectSubject(subject);
+
+
+    container.appendChild(button);
+
+  });
+}
+
+
+
+function selectSubject(subject) {
+
+  activeSubject =
+    subject;
+
+
+  activeRows =
+    rawData
+      .filter(
+        row =>
+          row.subject === activeSubject
+      )
+      .sort(
+        (a, b) =>
+          new Date(a.timestamp) -
+          new Date(b.timestamp)
+      );
+
+
+  frameIndex = 0;
+
+  stopReplay();
+
+
+  document
+    .querySelectorAll(".subject-pill")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.subject === subject
+      );
+
+    });
+
+
+  document.getElementById(
+    "subject-title"
+  ).textContent =
+    `Participant ${subject}`;
+
+
+  const slider =
+    document.getElementById(
+      "frame-slider"
+    );
+
+
+  slider.max =
+    Math.max(
+      0,
+      activeRows.length - 1
+    );
+
+
+  slider.value =
+    0;
+
+
+  renderAll();
+}
+
+
+
+/* =========================================================
+   CORE RENDER
+========================================================= */
+
+function renderAll() {
+
+  if (!activeRows.length) {
+    return;
+  }
+
+  frameIndex =
+    Math.max(
+      0,
+      Math.min(
+        frameIndex,
+        activeRows.length - 1
+      )
+    );
+
+
+  const row =
+    activeRows[frameIndex];
+
+
+  const uncertainty =
+    uncertaintyState(row);
+
+
+  document.getElementById(
+    "current-time-label"
+  ).textContent =
+    row.timestamp;
+
+
+  document.getElementById(
+    "frame-counter"
+  ).textContent =
+    `${frameIndex + 1} / ${activeRows.length}`;
+
+
+  document.getElementById(
+    "frame-slider"
+  ).value =
+    frameIndex;
+
+
+
+  /* MODEL ESTIMATE */
+
+  const estimate =
+    document.getElementById(
+      "model-estimate"
+    );
+
+
+  estimate.textContent =
+    uncertainty.display;
+
+
+  estimate.style.color =
+    stateColor(
+      uncertainty.display
+    );
+
+
+  document.getElementById(
+    "raw-prediction"
+  ).textContent =
+    `Raw classification: ${row.predicted_label}`;
+
+
+
+  /* CONFIDENCE */
+
+  document.getElementById(
+    "confidence-value"
+  ).textContent =
+    pct(
+      uncertainty.confidence
+    );
+
+
+  document.getElementById(
+    "margin-value"
+  ).textContent =
+    `Top-class margin: ${pct(
+      uncertainty.margin
+    )}`;
+
+
+
+  /* GROUND TRUTH */
+
+  const truthValue =
+    document.getElementById(
+      "ground-truth-value"
+    );
+
+
+  const truthLabel =
+    document.getElementById(
+      "ground-truth-label"
+    );
+
+
+  if (revealTruth) {
+
+    truthValue.textContent =
+      `${row.glucose.toFixed(0)} mg/dL`;
+
+
+    truthValue.style.color =
+      stateColor(
+        row.actual_label
+      );
+
+
+    truthLabel.textContent =
+      `${row.actual_label} • ${
+        row.correct
+          ? "Raw prediction correct"
+          : "Raw prediction incorrect"
+      }`;
+
+  }
+
+  else {
+
+    truthValue.textContent =
+      "Hidden";
+
+
+    truthValue.style.color =
+      "#dfe2f1";
+
+
+    truthLabel.textContent =
+      "Used only for validation";
+
+  }
+
+
+
+  /* PROBABILITIES */
+
+  renderProbabilities(row);
+
+  renderSubjectStatistics();
+
+  renderChart();
+
+  renderAudit();
+
+}
+
+
+
+/* =========================================================
+   PROBABILITY PANEL
+========================================================= */
+
+function renderProbabilities(row) {
+
+  const values = {
+    hypo: row.p_hypo,
+    normal: row.p_normal,
+    hyper: row.p_hyper
+  };
+
+
+  Object.entries(values)
+    .forEach(
+      ([name, value]) => {
+
+        document.getElementById(
+          `${name}-percent`
+        ).textContent =
+          pct(value);
+
+
+        document.getElementById(
+          `${name}-bar`
+        ).style.width =
+          `${value * 100}%`;
+
+      }
+    );
+
+
+  const result =
+    uncertaintyState(row);
+
+
+  const note =
+    document.getElementById(
+      "uncertainty-description"
+    );
+
+
+  if (result.uncertain) {
+
+    note.innerHTML = `
+      <span style="color:#ffb95f;font-weight:600;">
+        Low-separation output.
+      </span>
+
+      The application reports this window as
+      <strong>Uncertain</strong>
+      rather than presenting a weak argmax as a confident state.
+    `;
+
+  }
+
+  else {
+
+    note.innerHTML = `
+      Prediction passed the display threshold.
+      Model state:
+      <strong>${result.display}</strong>.
+    `;
+
+  }
+
+}
+
+
+
+/* =========================================================
+   SUBJECT KPIs
+========================================================= */
+
+function renderSubjectStatistics() {
+
+  const total =
+    activeRows.length;
+
+
+  const correct =
+    activeRows.filter(
+      row => row.correct
+    ).length;
+
+
+  const agreement =
+    total
+      ? correct / total
+      : 0;
+
+
+  document.getElementById(
+    "agreement-value"
+  ).textContent =
+    pct(agreement);
+
+
+  document.getElementById(
+    "frame-count"
+  ).textContent =
+    `${total} evaluation windows`;
+
+
+
+  const counts = {
+    hypo: 0,
+    normal: 0,
+    hyper: 0
+  };
+
+
+  let peak =
+    -Infinity;
+
+  let nadir =
+    Infinity;
+
+
+  activeRows.forEach(row => {
+
+    if (row.glucose < 70) {
+      counts.hypo++;
+    }
+
+    else if (row.glucose > 180) {
+      counts.hyper++;
+    }
+
+    else {
+      counts.normal++;
+    }
+
+
+    peak =
+      Math.max(
+        peak,
+        row.glucose
+      );
+
+
+    nadir =
+      Math.min(
+        nadir,
+        row.glucose
+      );
+
+  });
+
+
+  const hypoPct =
+    total
+      ? counts.hypo / total
+      : 0;
+
+
+  const normalPct =
+    total
+      ? counts.normal / total
+      : 0;
+
+
+  const hyperPct =
+    total
+      ? counts.hyper / total
+      : 0;
+
+
+  document.getElementById(
+    "distribution-hypo"
+  ).style.width =
+    `${hypoPct * 100}%`;
+
+
+  document.getElementById(
+    "distribution-normal"
+  ).style.width =
+    `${normalPct * 100}%`;
+
+
+  document.getElementById(
+    "distribution-hyper"
+  ).style.width =
+    `${hyperPct * 100}%`;
+
+
+  document.getElementById(
+    "distribution-hypo-label"
+  ).textContent =
+    pct(hypoPct);
+
+
+  document.getElementById(
+    "distribution-normal-label"
+  ).textContent =
+    pct(normalPct);
+
+
+  document.getElementById(
+    "distribution-hyper-label"
+  ).textContent =
+    pct(hyperPct);
+
+
+  document.getElementById(
+    "session-peak"
+  ).textContent =
+    `${peak.toFixed(0)} mg/dL`;
+
+
+  document.getElementById(
+    "session-nadir"
+  ).textContent =
+    `${nadir.toFixed(0)} mg/dL`;
+
+}
+
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+function visibleChartRows() {
+
+  if (chartWindow === "all") {
+    return activeRows;
+  }
+
+
+  const count =
+    Number(chartWindow);
+
+
+  const end =
+    frameIndex + 1;
+
+
+  const start =
+    Math.max(
+      0,
+      end - count
+    );
+
+
+  return activeRows.slice(
+    start,
+    end
+  );
+}
+
+
+
+function renderChart() {
+
+  const svg =
+    document.getElementById(
+      "glucose-chart"
+    );
+
+
+  const rows =
+    visibleChartRows();
+
+
+  if (!rows.length) {
+    return;
+  }
+
+
+  const width =
+    1000;
+
+  const height =
+    390;
+
+
+  const left =
+    65;
+
+  const right =
+    985;
+
+  const top =
+    30;
+
+  const bottom =
+    350;
+
+
+  const minGlucose =
+    30;
+
+  const maxGlucose =
+    300;
+
+
+  const x =
+    index => {
+
+      if (rows.length === 1) {
+        return left;
+      }
+
+      return (
+        left +
+        (index / (rows.length - 1)) *
+        (right - left)
+      );
+
+    };
+
+
+  const y =
+    glucose => {
+
+      const clamped =
+        Math.max(
+          minGlucose,
+          Math.min(
+            maxGlucose,
+            glucose
+          )
+        );
+
+
+      return (
+        bottom -
+        (
+          (clamped - minGlucose) /
+          (maxGlucose - minGlucose)
+        ) *
+        (bottom - top)
+      );
+
+    };
+
+
+  const y70 =
+    y(70);
+
+  const y180 =
+    y(180);
+
+
+
+  /* GRID */
+
+  let html = `
+
+    <rect
+      x="${left}"
+      y="${y180}"
+      width="${right-left}"
+      height="${y70-y180}"
+      fill="#4fdbc8"
+      opacity="0.06"
+    />
+
+  `;
+
+
+  [50, 70, 120, 180, 240, 300]
+    .forEach(value => {
+
+      const py =
+        y(value);
+
+
+      html += `
+
+        <line
+          x1="${left}"
+          x2="${right}"
+          y1="${py}"
+          y2="${py}"
+          class="chart-grid"
+        />
+
+        <text
+          x="${left-12}"
+          y="${py+4}"
+          fill="#869397"
+          text-anchor="end"
+          font-size="11"
+          font-family="JetBrains Mono"
+        >
+          ${value}
+        </text>
+
+      `;
+
+    });
+
+
+
+  /* THRESHOLDS */
+
+  html += `
+
+    <line
+      x1="${left}"
+      x2="${right}"
+      y1="${y70}"
+      y2="${y70}"
+      stroke="#ff8f87"
+      stroke-dasharray="6 6"
+      opacity="0.75"
+    />
+
+    <line
+      x1="${left}"
+      x2="${right}"
+      y1="${y180}"
+      y2="${y180}"
+      stroke="#ffb95f"
+      stroke-dasharray="6 6"
+      opacity="0.75"
+    />
+
+  `;
+
+
+
+  /* LINE */
+
+  const points =
+    rows
+      .map(
+        (row, index) =>
+          `${x(index)},${y(row.glucose)}`
+      )
+      .join(" ");
+
+
+  html += `
+
+    <polyline
+      points="${points}"
+      fill="none"
+      stroke="#4cd7f6"
+      stroke-width="3"
+      stroke-linejoin="round"
+      stroke-linecap="round"
+    />
+
+  `;
+
+
+
+  /* POINTS */
+
+  rows.forEach(
+    (row, index) => {
+
+      const color =
+        row.glucose < 70
+          ? "#ff8f87"
+          : row.glucose > 180
+            ? "#ffb95f"
+            : "#4fdbc8";
+
+
+      const isCurrent =
+        row === activeRows[frameIndex];
+
+
+      html += `
+
+        <circle
+          cx="${x(index)}"
+          cy="${y(row.glucose)}"
+          r="${isCurrent ? 7 : 3}"
+          fill="${color}"
+          stroke="#0a0e18"
+          stroke-width="${isCurrent ? 3 : 1.5}"
+        >
+          <title>
+            ${row.timestamp}
+            | ${row.glucose} mg/dL
+            | ${row.actual_label}
+            | Predicted ${row.predicted_label}
+          </title>
+        </circle>
+
+      `;
+
+    }
+  );
+
+
+  svg.innerHTML =
+    html;
+
+}
+
+
+
+/* =========================================================
+   MODEL BENCHMARK
+========================================================= */
+
+function renderModelCards() {
+
+  const container =
+    document.getElementById(
+      "model-cards"
+    );
+
+
+  container.innerHTML = "";
+
+
+  modelData.forEach(model => {
+
+    const name =
+      model.model;
+
+
+    const macroF1 =
+      Number(
+        model.macro_f1
+      );
+
+
+    const balanced =
+      Number(
+        model.balanced_accuracy
+      );
+
+
+    const hybrid =
+      name.toLowerCase() === "hybrid";
+
+
+    const card =
+      document.createElement("div");
+
+
+    card.className =
+      hybrid
+        ? "bg-cyan/10 border border-cyan/20 rounded-xl p-4"
+        : "bg-panel2 rounded-xl p-4";
+
+
+    card.innerHTML = `
+
+      <div class="flex justify-between items-center">
+
+        <span class="
+          font-semibold
+          ${hybrid ? "text-cyan" : ""}
+        ">
+          ${name}
+        </span>
+
+        ${
+          hybrid
+            ? `
+              <span class="
+                text-[10px]
+                font-mono uppercase
+                bg-cyan text-[#001f26]
+                rounded px-2 py-1
+              ">
+                Selected
+              </span>
+            `
+            : ""
+        }
+
+      </div>
+
+
+      <div class="
+        grid grid-cols-2
+        gap-3 mt-4
+      ">
+
+        <div class="
+          bg-[#0a0e18]
+          rounded-lg p-3
+        ">
+
+          <div class="
+            text-[10px]
+            font-mono uppercase
+            text-muted
+          ">
+            Macro F1
+          </div>
+
+          <div class="
+            metric-value
+            text-xl mt-1
+          ">
+            ${macroF1.toFixed(4)}
+          </div>
+
+        </div>
+
+
+        <div class="
+          bg-[#0a0e18]
+          rounded-lg p-3
+        ">
+
+          <div class="
+            text-[10px]
+            font-mono uppercase
+            text-muted
+          ">
+            Balanced Acc.
+          </div>
+
+          <div class="
+            metric-value
+            text-xl mt-1
+          ">
+            ${balanced.toFixed(4)}
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    container.appendChild(
+      card
+    );
+
+  });
+
+}
+
+
+
+/* =========================================================
+   AUDIT TABLE
+========================================================= */
+
+function filteredAuditRows() {
+
+  let rows =
+    activeRows;
+
+
+  if (auditFilter === "errors") {
+
+    rows =
+      rows.filter(
+        row => !row.correct
+      );
+
+  }
+
+
+  else if (auditFilter === "hypo") {
+
+    rows =
+      rows.filter(
+        row =>
+          row.actual_label ===
+          "Hypoglycemia"
+      );
+
+  }
+
+
+  else if (auditFilter === "hyper") {
+
+    rows =
+      rows.filter(
+        row =>
+          row.actual_label ===
+          "Hyperglycemia"
+      );
+
+  }
+
+
+  return rows;
+}
+
+
+
+function renderAudit() {
+
+  const tbody =
+    document.getElementById(
+      "audit-table"
+    );
+
+
+  tbody.innerHTML = "";
+
+
+  filteredAuditRows()
+    .slice(0, 100)
+    .forEach(row => {
+
+      const result =
+        uncertaintyState(row);
+
+
+      const tr =
+        document.createElement("tr");
+
+
+      tr.className =
+        "audit-row border-b border-panel4/40";
+
+
+      tr.innerHTML = `
+
+        <td class="
+          p-3 font-mono
+          text-xs text-muted
+          whitespace-nowrap
+        ">
+          ${row.timestamp}
+        </td>
+
+
+        <td class="
+          p-3 font-mono
+          text-xs
+        ">
+          ${row.subject}
+        </td>
+
+
+        <td class="
+          p-3 font-mono
+        ">
+          ${row.glucose.toFixed(0)} mg/dL
+        </td>
+
+
+        <td
+          class="p-3"
+          style="
+            color:
+              ${stateColor(
+                row.actual_label
+              )}
+          "
+        >
+          ${row.actual_label}
+        </td>
+
+
+        <td class="p-3">
+          ${row.predicted_label}
+
+          ${
+            result.uncertain
+              ? `
+                <div class="
+                  text-[10px]
+                  text-amber mt-1
+                ">
+                  Display: Uncertain
+                </div>
+              `
+              : ""
+          }
+        </td>
+
+
+        <td class="
+          p-3 font-mono
+          text-xs whitespace-nowrap
+        ">
+
+          <span class="text-danger">
+            ${row.p_hypo.toFixed(3)}
+          </span>
+
+          /
+
+          <span class="text-teal">
+            ${row.p_normal.toFixed(3)}
+          </span>
+
+          /
+
+          <span class="text-amber">
+            ${row.p_hyper.toFixed(3)}
+          </span>
+
+        </td>
+
+
+        <td class="
+          p-3 font-mono
+        ">
+          ${pct(row.confidence)}
+        </td>
+
+
+        <td class="p-3">
+
+          ${
+            row.correct
+
+              ? `
+                <span class="
+                  bg-teal/10 text-teal
+                  px-2 py-1 rounded
+                  text-xs
+                ">
+                  Correct
+                </span>
+              `
+
+              : `
+                <span class="
+                  bg-danger/10 text-danger
+                  px-2 py-1 rounded
+                  text-xs
+                ">
+                  Error
+                </span>
+              `
+          }
+
+        </td>
+
+      `;
+
+
+      tbody.appendChild(
+        tr
+      );
+
+    });
+
+}
+
+
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+
+function setupControls() {
+
+
+  /* SLIDER */
+
+  document.getElementById(
+    "frame-slider"
+  ).addEventListener(
+    "input",
+    event => {
+
+      frameIndex =
+        Number(
+          event.target.value
+        );
+
+      renderAll();
+
+    }
+  );
+
+
+
+  /* GROUND TRUTH */
+
+  document.getElementById(
+    "truth-toggle"
+  ).addEventListener(
+    "click",
+    event => {
+
+      revealTruth =
+        !revealTruth;
+
+
+      event.target.textContent =
+        revealTruth
+          ? "Hide"
+          : "Reveal";
+
+
+      renderAll();
+
+    }
+  );
+
+
+
+  /* PLAY */
+
+  document.getElementById(
+    "play-btn"
+  ).addEventListener(
+    "click",
+    () => {
+
+      if (playing) {
+        stopReplay();
+      }
+
+      else {
+        startReplay();
+      }
+
+    }
+  );
+
+
+
+  /* CHART WINDOWS */
+
+  document
+    .querySelectorAll(
+      ".window-btn"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          chartWindow =
+            button.dataset.window;
+
+
+          document
+            .querySelectorAll(
+              ".window-btn"
+            )
+            .forEach(btn => {
+
+              btn.className =
+                "window-btn bg-panel2 " +
+                "text-muted rounded-lg " +
+                "px-3 py-1 text-xs";
+
+            });
+
+
+          button.className =
+            "window-btn bg-panel4 " +
+            "text-cyan rounded-lg " +
+            "px-3 py-1 text-xs";
+
+
+          renderChart();
+
+        }
+      );
+
+    });
+
+
+
+  /* AUDIT FILTERS */
+
+  document
+    .querySelectorAll(
+      ".audit-filter"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          auditFilter =
+            button.dataset.filter;
+
+
+          document
+            .querySelectorAll(
+              ".audit-filter"
+            )
+            .forEach(btn => {
+
+              btn.className =
+                "audit-filter " +
+                "bg-panel2 text-muted " +
+                "rounded-lg px-3 py-2 text-xs";
+
+            });
+
+
+          button.className =
+            "audit-filter " +
+            "bg-panel4 text-cyan " +
+            "rounded-lg px-3 py-2 text-xs";
+
+
+          renderAudit();
+
+        }
+      );
+
+    });
+
+}
+
+
+
+function startReplay() {
+
+  if (!activeRows.length) {
+    return;
+  }
+
+
+  playing =
+    true;
+
+
+  document.getElementById(
+    "play-icon"
+  ).textContent =
+    "pause";
+
+
+  document.getElementById(
+    "play-label"
+  ).textContent =
+    "Pause Replay";
+
+
+  replayTimer =
+    setInterval(
+      () => {
+
+        frameIndex++;
+
+        if (
+          frameIndex >=
+          activeRows.length
+        ) {
+          frameIndex = 0;
+        }
+
+
+        renderAll();
+
+      },
+
+      900
+    );
+
+}
+
+
+
+function stopReplay() {
+
+  playing =
+    false;
+
+
+  if (replayTimer) {
+
+    clearInterval(
+      replayTimer
+    );
+
+    replayTimer =
+      null;
+
+  }
+
+
+  const icon =
+    document.getElementById(
+      "play-icon"
+    );
+
+
+  const label =
+    document.getElementById(
+      "play-label"
+    );
+
+
+  if (icon) {
+    icon.textContent =
+      "play_arrow";
+  }
+
+
+  if (label) {
+    label.textContent =
+      "Play Replay";
+  }
+
+}
+
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function setupNavigation() {
+
+  document
+    .querySelectorAll(
+      ".nav-btn"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const target =
+            document.getElementById(
+              button.dataset.section
+            );
+
+
+          if (target) {
+
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+
+          }
+
+
+          document
+            .querySelectorAll(
+              ".nav-btn"
+            )
+            .forEach(btn => {
+
+              btn.classList.remove(
+                "active"
+              );
+
+            });
+
+
+          button.classList.add(
+            "active"
+          );
+
+        }
+      );
+
+    });
+
+}
+
+
+
+/* =========================================================
+   START
+========================================================= */
+
+init();
+
+</script>
+
+</body>
+</html>
