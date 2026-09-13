@@ -1,0 +1,2 @@
+tcn_weight,catboost_weight,macro_f1,balanced_accuracy
+0.75,0.25,0.3289234504478969,0.38114259548617185
